@@ -1,5 +1,7 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptionsWithName } from "@supabase/ssr";
 import { cookies } from "next/headers";
+
+type CookieToSet = { name: string; value: string; options?: CookieOptionsWithName };
 
 // Cliente de Supabase para uso en Server Components / Route Handlers.
 // Solo utiliza la clave publishable/anon: nunca la service_role key.
@@ -14,7 +16,7 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: CookieToSet[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
