@@ -18,7 +18,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   not_authenticated: "Debes iniciar sesión para añadir un creador.",
   invalid_username: "El usuario de TikTok debe tener 2-24 caracteres: letras minúsculas, números, puntos o _.",
   invalid_display_name: "Escribe un nombre para mostrar.",
-  too_many_pending: "Ya tienes 3 creadores esperando aprobación. Espera a que se revisen antes de añadir más.",
+  too_many_creators: "Ya tienes 5 creadores en el ranking, ese es el máximo por usuario.",
   username_taken: "Ese usuario de TikTok ya está en el ranking.",
 };
 
@@ -101,7 +101,7 @@ export default function SubmitCreatorPage() {
       return;
     }
 
-    setMessage({ type: "success", text: "🔥 ¡Enviado! Tu creador está pendiente de aprobación." });
+    setMessage({ type: "success", text: "🔥 ¡Ya está en el ranking! A partir de ahora cualquiera puede pujar por él." });
     setTiktokUsername("");
     setDisplayName("");
     setAvatarUrl("");
@@ -128,8 +128,7 @@ export default function SubmitCreatorPage() {
     <section className="mx-auto max-w-md px-4 py-16">
       <h1 className="font-display text-2xl font-bold">Añade tu creador ⚔️</h1>
       <p className="mt-1 text-sm text-white/50">
-        Añade cualquier perfil de TikTok al ranking. Empieza en $1 y queda pendiente de
-        aprobación antes de aparecer públicamente.
+        Añade cualquier perfil de TikTok al ranking. Empieza en $1 y se activa al instante.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
