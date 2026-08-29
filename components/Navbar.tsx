@@ -42,6 +42,7 @@ export default function Navbar() {
           <Link href="/#ranking" className="hover:text-white transition-colors">Ranking</Link>
           <Link href="/battles" className="hover:text-white transition-colors">Batallas</Link>
           <Link href="/records" className="hover:text-white transition-colors">Récords</Link>
+          <Link href="/submit" className="text-neon-cyan hover:text-white transition-colors">+ Añadir creador</Link>
           <Link href="/#como-funciona" className="hover:text-white transition-colors">Cómo funciona</Link>
         </nav>
 
@@ -89,6 +90,7 @@ export default function Navbar() {
             <Link href="/#ranking" onClick={() => setMenuOpen(false)}>Ranking</Link>
             <Link href="/battles" onClick={() => setMenuOpen(false)}>Batallas</Link>
             <Link href="/records" onClick={() => setMenuOpen(false)}>Récords</Link>
+            <Link href="/submit" onClick={() => setMenuOpen(false)} className="text-neon-cyan">+ Añadir creador</Link>
             <Link href="/#como-funciona" onClick={() => setMenuOpen(false)}>Cómo funciona</Link>
             <div className="mt-2 flex gap-3">
               {email ? (

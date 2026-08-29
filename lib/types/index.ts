@@ -75,3 +75,14 @@ export interface PlaceBidResult {
   new_bid?: number;
   bid_id?: string;
 }
+
+export interface SubmitCreatorResult {
+  success: boolean;
+  error?:
+    | "not_authenticated"
+    | "invalid_username"
+    | "invalid_display_name"
+    | "too_many_pending"
+    | "username_taken";
+  creator_id?: string;
+}

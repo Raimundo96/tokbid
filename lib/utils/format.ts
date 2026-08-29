@@ -36,3 +36,9 @@ const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
 export function isValidUsername(value: string): boolean {
   return USERNAME_REGEX.test(value);
 }
+
+const CREATOR_USERNAME_REGEX = /^[a-z0-9._]{2,24}$/;
+
+export function isValidCreatorUsername(value: string): boolean {
+  return CREATOR_USERNAME_REGEX.test(value.toLowerCase());
+}
