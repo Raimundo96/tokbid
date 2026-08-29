@@ -34,6 +34,8 @@ export interface RankingRow {
   avatar_url: string | null;
   followers: number;
   current_bid: number;
+  current_bidder_id: string | null;
+  current_bidder_username: string | null;
   beat_by: number;
   position: number;
 }

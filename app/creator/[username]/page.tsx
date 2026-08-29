@@ -61,6 +61,11 @@ export default async function CreatorProfilePage({
           {row.position === 1 ? "🏆" : `#${row.position}`}
         </p>
         <p className="mt-1 font-mono text-3xl font-bold text-gold">{formatMoney(row.current_bid)}</p>
+        {row.current_bidder_username && (
+          <p className="mt-1 text-xs text-white/50">
+            Puja actual de <span className="text-white">@{row.current_bidder_username}</span>
+          </p>
+        )}
 
         {isDefending && (
           <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-neon-pink/10 px-3 py-1 text-xs font-semibold text-neon-pink">

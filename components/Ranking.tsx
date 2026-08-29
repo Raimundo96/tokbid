@@ -76,6 +76,7 @@ export default function Ranking() {
               <th className="px-4 py-3 font-medium">Creador</th>
               <th className="hidden px-4 py-3 font-medium sm:table-cell">Seguidores</th>
               <th className="px-4 py-3 font-medium">Puja</th>
+              <th className="hidden px-4 py-3 font-medium sm:table-cell">Puja de</th>
               <th className="px-4 py-3 font-medium">Superar por</th>
             </tr>
           </thead>
@@ -97,6 +98,9 @@ export default function Ranking() {
                 </td>
                 <td className="px-4 py-3 font-mono font-bold text-neon-cyan">
                   {formatMoney(row.current_bid)}
+                </td>
+                <td className="hidden px-4 py-3 text-white/50 sm:table-cell">
+                  {row.current_bidder_username ? `@${row.current_bidder_username}` : "—"}
                 </td>
                 <td className="px-4 py-3 font-mono text-white/50">{formatMoney(row.beat_by)}</td>
               </tr>

@@ -18,7 +18,10 @@ export default function CreatorCard({ row }: { row: RankingRow }) {
       </div>
       <div className="flex-1">
         <p className="font-semibold">@{row.tiktok_username} {countryFlag(row.country)}</p>
-        <p className="text-xs text-white/40">{formatFollowers(row.followers)} seguidores</p>
+        <p className="text-xs text-white/40">
+          {formatFollowers(row.followers)} seguidores
+          {row.current_bidder_username && ` · puja de @${row.current_bidder_username}`}
+        </p>
       </div>
       <p className="font-mono font-bold text-neon-cyan">{formatMoney(row.current_bid)}</p>
     </Link>

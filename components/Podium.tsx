@@ -29,6 +29,11 @@ function PodiumCard({ row }: { row: RankingRow }) {
       <p className={`mt-2 font-mono text-lg font-bold ${isFirst ? "text-gold" : "text-neon-cyan"}`}>
         {formatMoney(row.current_bid)}
       </p>
+      {row.current_bidder_username && (
+        <p className="mt-0.5 text-[11px] text-white/40">
+          puja de <span className="text-white/60">@{row.current_bidder_username}</span>
+        </p>
+      )}
       <p className="text-[11px] text-white/40">{formatFollowers(row.followers)} seguidores</p>
     </Link>
   );
