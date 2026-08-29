@@ -18,20 +18,35 @@ export default function ActivityFeed() {
     let active = true;
 
     async function load() {
-      const { data, error } = await supabase
+      const { data: bids, error } = await supabase
         .from("bids")
-        .select("id, amount, created_at, creators(tiktok_username)")
+        .select("id, amount, created_at, bidder_id, creators(tiktok_username)")
         .order("created_at", { ascending: false })
         .limit(8);
 
-      if (!active || error || !data) return;
+      if (!active || error || !bids) return;
 
-      const mapped: ActivityItem[] = data.map((b: any) => ({
-        id: b.id,
-        created_at: b.created_at,
-        text: `@${b.creators?.tiktok_username ?? "creador"} aumentó su puja a ${formatMoney(b.amount)}`,
-      }));
-      setItems(mapped);
+      // Buscamos los nombres de usuario públicos de quienes pujaron,
+      // en una consulta aparte (a través de la vista public_profiles).
+      const bidderIds = [...new Set(bids.map((b: any) => b.bidder_id))];
+      const { data: bidders } = await supabase
+        .from("public_profiles")
+        .select("id, username")
+        .in("id", bidderIds);
+
+      const usernameById = new Map((bidders ?? []).map((p: any) => [p.id, p.username]));
+
+      const mapped: ActivityItem[] = bids.map((b: any) => {
+        const bidderName = usernameById.get(b.bidder_id) ?? "Alguien";
+        const creatorName = b.creators?.tiktok_username ?? "un creador";
+        return {
+          id: b.id,
+          created_at: b.created_at,
+          text: `@${bidderName} pujó ${formatMoney(b.amount)} por @${creatorName}`,
+        };
+      });
+
+      if (active) setItems(mapped);
     }
 
     load();

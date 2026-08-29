@@ -30,3 +30,9 @@ export function timeAgo(iso: string): string {
   const days = Math.floor(hours / 24);
   return `hace ${days} d`;
 }
+
+const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
+
+export function isValidUsername(value: string): boolean {
+  return USERNAME_REGEX.test(value);
+}

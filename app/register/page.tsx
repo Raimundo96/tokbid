@@ -2,40 +2,89 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { isValidUsername } from "@/lib/utils/format";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
+  const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signUp({ email, password });
-
-    setLoading(false);
-
-    if (error) {
-      setError(`No se pudo completar el registro: ${error.message}`);
+    const cleanUsername = username.trim();
+    if (!isValidUsername(cleanUsername)) {
+      setError("El nombre de usuario debe tener 3-20 caracteres: letras, números o _.");
       return;
     }
 
-    setDone(true);
+    setLoading(true);
+    const supabase = createClient();
+
+    // Comprobar disponibilidad antes de registrar
+    const { data: existing } = await supabase
+      .from("public_profiles")
+      .select("id")
+      .ilike("username", cleanUsername)
+      .maybeSingle();
+
+    if (existing) {
+      setLoading(false);
+      setError("Ese nombre de usuario ya está en uso, prueba otro.");
+      return;
+    }
+
+    const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
+
+    if (signUpError) {
+      setLoading(false);
+      setError(`No se pudo completar el registro: ${signUpError.message}`);
+      return;
+    }
+
+    // Si la confirmación por email está activada, no hay sesión todavía:
+    // no podemos guardar el username hasta que el usuario confirme e inicie sesión.
+    if (!data.session || !data.user) {
+      setLoading(false);
+      setNeedsEmailConfirm(true);
+      return;
+    }
+
+    const { error: usernameError } = await supabase
+      .from("profiles")
+      .update({ username: cleanUsername })
+      .eq("id", data.user.id);
+
+    setLoading(false);
+
+    if (usernameError) {
+      setError(
+        usernameError.code === "23505"
+          ? "Ese nombre de usuario ya está en uso, prueba otro."
+          : "Cuenta creada, pero no se pudo guardar el nombre de usuario. Podrás configurarlo al iniciar sesión."
+      );
+      return;
+    }
+
+    router.push("/");
+    router.refresh();
   }
 
-  if (done) {
+  if (needsEmailConfirm) {
     return (
       <section className="mx-auto flex max-w-sm flex-col items-center px-4 py-24 text-center">
         <span className="text-3xl">✅</span>
         <h1 className="mt-3 font-display text-xl font-bold">Revisa tu email</h1>
         <p className="mt-2 text-sm text-white/50">
-          Te hemos enviado un enlace de confirmación para activar tu cuenta.
+          Te hemos enviado un enlace de confirmación. Cuando confirmes e inicies sesión,
+          te pediremos tu nombre de usuario.
         </p>
         <Link href="/login" className="mt-6 text-sm text-neon-cyan underline">
           Ir a iniciar sesión
@@ -50,6 +99,23 @@ export default function RegisterPage() {
       <p className="mt-1 text-sm text-white/50">Regístrate para empezar a pujar.</p>
 
       <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+        <div>
+          <label htmlFor="username" className="mb-1 block text-xs text-white/50">
+            Nombre de usuario público
+          </label>
+          <input
+            id="username"
+            type="text"
+            required
+            placeholder="ej. juanperez"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="focus-ring w-full rounded-lg border border-base-line bg-base-panel px-3 py-2 text-sm"
+          />
+          <p className="mt-1 text-[11px] text-white/30">
+            Esto es lo que verán los demás junto a tus pujas.
+          </p>
+        </div>
         <div>
           <label htmlFor="email" className="mb-1 block text-xs text-white/50">Email</label>
           <input

@@ -25,10 +25,17 @@ export default async function CreatorProfilePage({
 
   const { data: history } = await supabase
     .from("bids")
-    .select("id, amount, created_at")
+    .select("id, amount, created_at, bidder_id")
     .eq("creator_id", row.id)
     .order("created_at", { ascending: false })
     .limit(20);
+
+  const bidderIds = [...new Set((history ?? []).map((b) => b.bidder_id))];
+  const { data: bidders } = bidderIds.length
+    ? await supabase.from("public_profiles").select("id, username").in("id", bidderIds)
+    : { data: [] as { id: string; username: string }[] };
+
+  const usernameById = new Map((bidders ?? []).map((p) => [p.id, p.username]));
 
   const isDefending = row.position === 1;
 
@@ -79,6 +86,7 @@ export default async function CreatorProfilePage({
                 key={b.id}
                 className="flex items-center justify-between rounded-xl border border-base-line px-4 py-3 text-sm"
               >
+                <span className="text-white/70">@{usernameById.get(b.bidder_id) ?? "Alguien"}</span>
                 <span className="font-mono text-neon-cyan">{formatMoney(b.amount)}</span>
                 <span className="text-xs text-white/40">{timeAgo(b.created_at)}</span>
               </li>

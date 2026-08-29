@@ -1,3 +1,15 @@
+export interface Profile {
+  id: string;
+  email: string;
+  username: string | null;
+  created_at: string;
+}
+
+export interface PublicProfile {
+  id: string;
+  username: string;
+}
+
 export type CreatorStatus = "active" | "pending" | "suspended";
 
 export interface Creator {
