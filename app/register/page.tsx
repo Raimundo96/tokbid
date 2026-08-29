@@ -22,7 +22,7 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (error) {
-      setError("No se pudo completar el registro. Inténtalo de nuevo.");
+      setError(`No se pudo completar el registro: ${error.message}`);
       return;
     }
 

@@ -23,7 +23,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (error) {
-      setError("No se pudo iniciar sesión. Revisa tu email y contraseña.");
+      setError(`No se pudo iniciar sesión: ${error.message}`);
       return;
     }
 
