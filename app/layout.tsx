@@ -21,7 +21,11 @@ export default function RootLayout({
         <UsernameGate />
         <main className="flex-1">{children}</main>
         <footer className="border-t border-base-line py-8 text-center text-sm text-white/40">
-          TokBid — Puja de prueba, sin dinero real en esta versión.
+          TokBid — pagos reales procesados de forma segura con Stripe.
+          <div className="mt-2 flex justify-center gap-4 text-xs">
+            <a href="/terms" className="hover:text-white/70">Términos y Condiciones</a>
+            <a href="/privacy" className="hover:text-white/70">Privacidad</a>
+          </div>
         </footer>
       </body>
     </html>
