@@ -4,5 +4,5 @@ import Stripe from "stripe";
 // nunca en componentes de cliente. STRIPE_SECRET_KEY no lleva
 // NEXT_PUBLIC_, así que nunca llega al navegador.
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-11-20.acacia",
+  apiVersion: "2025-02-24.acacia",
 });
