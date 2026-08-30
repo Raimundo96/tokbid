@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatMoney } from "@/lib/utils/format";
-import { PlaceBidResult } from "@/lib/types";
 
 interface Props {
   creatorId: string;
@@ -11,14 +10,7 @@ interface Props {
   onSuccess?: () => void;
 }
 
-const ERROR_MESSAGES: Record<string, string> = {
-  not_authenticated: "Debes iniciar sesión para pujar.",
-  invalid_amount: "El importe debe ser mayor que 0.",
-  creator_not_found: "No se pudo encontrar este creador.",
-  bid_too_low: "Necesitas superar la puja actual.",
-};
-
-export default function BidPanel({ creatorId, currentBid, onSuccess }: Props) {
+export default function BidPanel({ creatorId, currentBid }: Props) {
   const [amount, setAmount] = useState(currentBid + 1);
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,34 +28,34 @@ export default function BidPanel({ creatorId, currentBid, onSuccess }: Props) {
   async function handleBid() {
     setLoading(true);
     setMessage(null);
-    const supabase = createClient();
 
-    const { data, error } = await supabase.rpc("place_bid", {
-      p_creator_id: creatorId,
-      p_amount: amount,
-    });
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ creatorId, amount }),
+      });
 
-    setLoading(false);
+      const data = await res.json();
 
-    if (error) {
-      setMessage({ type: "error", text: "❌ No se pudo registrar la puja." });
-      return;
+      if (!res.ok || !data.url) {
+        setMessage({ type: "error", text: data.error ?? "No se pudo iniciar el pago." });
+        setLoading(false);
+        return;
+      }
+
+      // Redirige al checkout seguro de Stripe. La puja NO se aplica
+      // todavía: solo se aplicará cuando Stripe confirme el pago
+      // mediante el webhook.
+      window.location.href = data.url;
+    } catch {
+      setMessage({ type: "error", text: "No se pudo conectar con el pago. Inténtalo de nuevo." });
+      setLoading(false);
     }
-
-    const result = data as PlaceBidResult;
-
-    if (!result.success) {
-      const text = result.error ? ERROR_MESSAGES[result.error] : "No se pudo registrar la puja.";
-      setMessage({ type: "error", text: text ?? "No se pudo registrar la puja." });
-      if (result.minimum_required) setAmount(result.minimum_required);
-      return;
-    }
-
-    setMessage({ type: "success", text: "🔥 ¡Puja registrada!" });
-    onSuccess?.();
   }
 
   const minimum = currentBid + 1;
+  const toCharge = Math.max(amount - currentBid, 0);
 
   return (
     <div className="card-panel rounded-2xl border border-base-line p-6">
@@ -99,6 +91,10 @@ export default function BidPanel({ creatorId, currentBid, onSuccess }: Props) {
         </button>
       </div>
 
+      <p className="mt-2 text-center text-xs text-white/40">
+        Pagarás <span className="text-white/70">{formatMoney(toCharge)}</span> (la diferencia para superar la puja actual)
+      </p>
+
       {isAuthed === false ? (
         <p className="mt-5 text-center text-sm text-white/50">
           Debes iniciar sesión para pujar.{" "}
@@ -111,7 +107,7 @@ export default function BidPanel({ creatorId, currentBid, onSuccess }: Props) {
           onClick={handleBid}
           className="focus-ring mt-5 w-full rounded-full bg-neon-pink py-3 text-sm font-extrabold uppercase tracking-wide text-white shadow-neon-pink transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {loading ? "Enviando..." : "⚔️ Pujar y ser #1"}
+          {loading ? "Conectando con el pago..." : "⚔️ Pagar y ser #1"}
         </button>
       )}
 
@@ -121,7 +117,7 @@ export default function BidPanel({ creatorId, currentBid, onSuccess }: Props) {
         </p>
       )}
 
-      <p className="mt-3 text-center text-[11px] text-white/30">Pago seguro · puja de prueba, sin dinero real</p>
+      <p className="mt-3 text-center text-[11px] text-white/30">🔒 Pago seguro con Stripe</p>
     </div>
   );
 }

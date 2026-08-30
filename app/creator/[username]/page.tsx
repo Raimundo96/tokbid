@@ -4,13 +4,16 @@ import { createClient } from "@/lib/supabase/server";
 import { formatMoney, formatFollowers, countryFlag, timeAgo } from "@/lib/utils/format";
 import CreatorBidSection from "./CreatorBidSection";
 import ShareButton from "@/components/ShareButton";
+import PaymentStatusBanner from "./PaymentStatusBanner";
 
 export const dynamic = "force-dynamic";
 
 export default async function CreatorProfilePage({
   params,
+  searchParams,
 }: {
   params: { username: string };
+  searchParams: { paid?: string };
 }) {
   const { username } = params;
   const supabase = await createClient();
@@ -41,6 +44,7 @@ export default async function CreatorProfilePage({
 
   return (
     <section className="mx-auto max-w-2xl px-4 py-16">
+      <PaymentStatusBanner status={searchParams.paid} />
       <div className="card-panel rounded-2xl border border-base-line p-8 text-center">
         <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-full border-2 border-neon-cyan">
           {row.avatar_url ? (
