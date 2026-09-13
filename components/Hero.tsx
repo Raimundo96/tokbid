@@ -10,17 +10,11 @@ export default function Hero() {
           ¿Quién merece
           <br />
           ser el{" "}
-          <span
-            data-text="#1"
-            className="glitch-text text-gradient-pink-cyan"
-          >
-            #1
-          </span>
-          ?
+          <span data-text="#1" className="glitch-text text-gradient-pink-cyan">#1</span>?
         </h1>
 
         <p className="mx-auto mt-6 max-w-xl text-base font-medium text-white/60 sm:text-lg">
-          Supera la puja. Sube al ranking. Defiende tu posición.
+          Supera la puja. Sube al ranking. Defiende tu posición. Sin cuentas, sin registro.
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-2">
@@ -30,7 +24,7 @@ export default function Hero() {
           >
             ⚔️ Superar al #1
           </a>
-          <span className="text-xs text-white/40">Desde $1 · pago de prueba</span>
+          <span className="text-xs text-white/40">Desde $1 · pago con Stripe</span>
         </div>
       </div>
     </section>

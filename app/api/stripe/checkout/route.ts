@@ -1,24 +1,21 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/client";
 
 export async function POST(request: Request) {
-  const { creatorId, amount } = await request.json();
+  const { creatorId, amount, bidderName } = await request.json();
 
   if (!creatorId || typeof amount !== "number" || amount <= 0) {
     return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
   }
 
-  const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  const user = userData.user;
-
-  if (!user) {
-    return NextResponse.json({ error: "Debes iniciar sesión para pujar" }, { status: 401 });
+  const cleanName = typeof bidderName === "string" ? bidderName.trim().slice(0, 40) : "";
+  if (!cleanName) {
+    return NextResponse.json({ error: "Escribe tu nombre para poder pujar" }, { status: 400 });
   }
 
-  // Leemos el creador para calcular cuánto hay que COBRAR de verdad
-  // (solo la diferencia sobre la puja actual, no el total).
+  const supabase = createClient();
+
   const { data: creator, error: creatorError } = await supabase
     .from("creators")
     .select("id, tiktok_username, current_bid, status")
@@ -31,10 +28,7 @@ export async function POST(request: Request) {
   }
 
   if (amount <= creator.current_bid) {
-    return NextResponse.json(
-      { error: `Debes pujar más de ${creator.current_bid}` },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: `Debes pujar más de ${creator.current_bid}` }, { status: 400 });
   }
 
   const amountToCharge = amount - creator.current_bid;
@@ -43,28 +37,27 @@ export async function POST(request: Request) {
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     payment_method_types: ["card"],
-    customer_email: user.email ?? undefined,
     line_items: [
       {
         price_data: {
           currency: "usd",
           product_data: {
             name: `Superar la puja de @${creator.tiktok_username} en TokBid`,
-            description: `Nueva puja total: $${amount}`,
+            description: `Nueva puja total: $${amount} · Puja de ${cleanName}`,
           },
-          unit_amount: Math.round(amountToCharge * 100), // Stripe usa céntimos
+          unit_amount: Math.round(amountToCharge * 100),
         },
         quantity: 1,
       },
     ],
     metadata: {
       creator_id: creator.id,
-      bidder_id: user.id,
+      bidder_name: cleanName,
       new_total_bid: String(amount),
       amount_charged: String(amountToCharge),
     },
-    success_url: `${siteUrl}/creator/${creator.tiktok_username}?paid=success`,
-    cancel_url: `${siteUrl}/creator/${creator.tiktok_username}?paid=cancelled`,
+    success_url: `${siteUrl}/?paid=success`,
+    cancel_url: `${siteUrl}/?paid=cancelled`,
   });
 
   return NextResponse.json({ url: session.url });

@@ -10,12 +10,7 @@ export function formatFollowers(count: number): string {
 
 export function countryFlag(code: string | null): string {
   const flags: Record<string, string> = {
-    es: "🇪🇸",
-    mx: "🇲🇽",
-    ar: "🇦🇷",
-    gq: "🇬🇶",
-    ng: "🇳🇬",
-    global: "🌎",
+    es: "🇪🇸", mx: "🇲🇽", ar: "🇦🇷", gq: "🇬🇶", ng: "🇳🇬", global: "🌎",
   };
   return flags[code ?? ""] ?? "🌎";
 }
@@ -29,16 +24,4 @@ export function timeAgo(iso: string): string {
   if (hours < 24) return `hace ${hours} h`;
   const days = Math.floor(hours / 24);
   return `hace ${days} d`;
-}
-
-const USERNAME_REGEX = /^[a-zA-Z0-9_]{3,20}$/;
-
-export function isValidUsername(value: string): boolean {
-  return USERNAME_REGEX.test(value);
-}
-
-const CREATOR_USERNAME_REGEX = /^[a-z0-9._]{2,24}$/;
-
-export function isValidCreatorUsername(value: string): boolean {
-  return CREATOR_USERNAME_REGEX.test(value.toLowerCase());
 }

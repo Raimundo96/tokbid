@@ -1,11 +1,8 @@
-"use client";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
-import { createBrowserClient } from "@supabase/ssr";
-
-// Cliente de Supabase para uso en componentes de cliente ("use client").
-// Solo utiliza la clave publishable/anon: nunca la service_role key.
+// Cliente de Supabase para el navegador. Solo usa la clave anon/publishable.
 export function createClient() {
-  return createBrowserClient(
+  return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );

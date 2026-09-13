@@ -1,31 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { formatMoney } from "@/lib/utils/format";
+import { RankingRow } from "@/lib/types";
 
 interface Props {
-  creatorId: string;
-  currentBid: number;
-  onSuccess?: () => void;
+  creator: RankingRow;
 }
 
-export default function BidPanel({ creatorId, currentBid }: Props) {
+export default function BidPanel({ creator }: Props) {
+  const currentBid = creator.current_bid;
   const [amount, setAmount] = useState(currentBid + 1);
-  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     setAmount(currentBid + 1);
-  }, [currentBid]);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setIsAuthed(!!data.user));
-  }, []);
+    setMessage(null);
+  }, [creator.id, currentBid]);
 
   async function handleBid() {
+    if (!name.trim()) {
+      setMessage({ type: "error", text: "Escribe tu nombre para poder pujar." });
+      return;
+    }
+
     setLoading(true);
     setMessage(null);
 
@@ -33,7 +33,7 @@ export default function BidPanel({ creatorId, currentBid }: Props) {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ creatorId, amount }),
+        body: JSON.stringify({ creatorId: creator.id, amount, bidderName: name.trim() }),
       });
 
       const data = await res.json();
@@ -44,9 +44,6 @@ export default function BidPanel({ creatorId, currentBid }: Props) {
         return;
       }
 
-      // Redirige al checkout seguro de Stripe. La puja NO se aplica
-      // todavía: solo se aplicará cuando Stripe confirme el pago
-      // mediante el webhook.
       window.location.href = data.url;
     } catch {
       setMessage({ type: "error", text: "No se pudo conectar con el pago. Inténtalo de nuevo." });
@@ -59,11 +56,13 @@ export default function BidPanel({ creatorId, currentBid }: Props) {
 
   return (
     <div className="card-panel rounded-2xl border border-base-line p-6">
-      <p className="font-display text-lg font-extrabold uppercase tracking-wide">⚔️ Supera al #1</p>
+      <p className="font-display text-lg font-extrabold uppercase tracking-wide">
+        ⚔️ Superar a @{creator.tiktok_username}
+      </p>
       <p className="mt-1 text-sm text-white/50">Puja actual</p>
       <p className="mt-1 font-mono text-4xl font-extrabold text-gold">{formatMoney(currentBid)}</p>
       <p className="mt-2 text-sm text-white/50">
-        Para convertirte en #1: <span className="font-bold text-white">{formatMoney(minimum)}</span> mínimo
+        Para superarla: <span className="font-bold text-white">{formatMoney(minimum)}</span> mínimo
       </p>
 
       <div className="mt-5 flex items-center justify-center gap-3">
@@ -75,10 +74,7 @@ export default function BidPanel({ creatorId, currentBid }: Props) {
         >
           −
         </button>
-        <span
-          key={amount}
-          className="min-w-[100px] animate-bidBump text-center font-mono text-xl font-extrabold"
-        >
+        <span key={amount} className="min-w-[100px] animate-bidBump text-center font-mono text-xl font-extrabold">
           {formatMoney(amount)}
         </span>
         <button
@@ -95,21 +91,24 @@ export default function BidPanel({ creatorId, currentBid }: Props) {
         Pagarás <span className="text-white/70">{formatMoney(toCharge)}</span> (la diferencia para superar la puja actual)
       </p>
 
-      {isAuthed === false ? (
-        <p className="mt-5 text-center text-sm text-white/50">
-          Debes iniciar sesión para pujar.{" "}
-          <a href="/login" className="text-neon-cyan underline">Inicia sesión</a>
-        </p>
-      ) : (
-        <button
-          type="button"
-          disabled={loading || amount <= currentBid}
-          onClick={handleBid}
-          className="focus-ring mt-5 w-full rounded-full bg-neon-pink py-3 text-sm font-extrabold uppercase tracking-wide text-white shadow-neon-pink transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {loading ? "Conectando con el pago..." : "⚔️ Pagar y ser #1"}
-        </button>
-      )}
+      <input
+        type="text"
+        required
+        placeholder="Tu nombre (se mostrará en el ranking)"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        maxLength={40}
+        className="focus-ring mt-4 w-full rounded-lg border border-base-line bg-base-panel px-3 py-2 text-center text-sm"
+      />
+
+      <button
+        type="button"
+        disabled={loading || amount <= currentBid}
+        onClick={handleBid}
+        className="focus-ring mt-4 w-full rounded-full bg-neon-pink py-3 text-sm font-extrabold uppercase tracking-wide text-white shadow-neon-pink transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        {loading ? "Conectando con el pago..." : "⚔️ Pagar y superar"}
+      </button>
 
       {message && (
         <p className={`mt-3 text-center text-sm ${message.type === "success" ? "text-neon-cyan" : "text-neon-pink"}`}>
@@ -117,7 +116,7 @@ export default function BidPanel({ creatorId, currentBid }: Props) {
         </p>
       )}
 
-      <p className="mt-3 text-center text-[11px] text-white/30">🔒 Pago seguro con Stripe</p>
+      <p className="mt-3 text-center text-[11px] text-white/30">🔒 Pago seguro con Stripe · sin cuenta ni registro</p>
     </div>
   );
 }
