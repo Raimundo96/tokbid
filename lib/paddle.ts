@@ -1,9 +1,3 @@
-/**
- * Cliente mínimo para Paddle Billing (server-side).
- * Sandbox: https://sandbox-api.paddle.com
- * Live:    https://api.paddle.com
- */
-
 const PADDLE_API_BASE =
   process.env.PADDLE_ENV === "live"
     ? "https://api.paddle.com"
@@ -30,32 +24,22 @@ export async function paddleFetch<T = unknown>(
   });
 
   const json = await res.json().catch(() => ({}));
-
   if (!res.ok) {
     const msg =
       (json as { error?: { detail?: string } })?.error?.detail ||
       `Paddle API error ${res.status}`;
     throw new Error(msg);
   }
-
   return json as T;
 }
 
-export type CreateTransactionInput = {
+export async function createPaddleTransaction(input: {
   productId: string;
-  amountUsd: number; // dólares (ej. 5.5)
+  amountUsd: number;
   description: string;
   customData: Record<string, string>;
-};
-
-/**
- * Crea una transaction con precio dinámico (non-catalog)
- * y devuelve el transaction id para abrir el checkout overlay.
- */
-export async function createPaddleTransaction(input: CreateTransactionInput) {
-  // Paddle espera el importe en la unidad menor como string ("550" = $5.50)
+}) {
   const amountCents = String(Math.round(input.amountUsd * 100));
-
   const body = {
     items: [
       {
@@ -63,10 +47,7 @@ export async function createPaddleTransaction(input: CreateTransactionInput) {
         price: {
           description: input.description,
           name: input.description.slice(0, 50),
-          unit_price: {
-            amount: amountCents,
-            currency_code: "USD",
-          },
+          unit_price: { amount: amountCents, currency_code: "USD" },
           product_id: input.productId,
         },
       },
@@ -80,6 +61,16 @@ export async function createPaddleTransaction(input: CreateTransactionInput) {
     method: "POST",
     body: JSON.stringify(body),
   });
+  return result.data;
+}
 
+export async function getPaddleTransaction(transactionId: string) {
+  const result = await paddleFetch<{
+    data: {
+      id: string;
+      status: string;
+      custom_data?: Record<string, string> | null;
+    };
+  }>(`/transactions/${transactionId}`);
   return result.data;
 }
