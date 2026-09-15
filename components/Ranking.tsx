@@ -28,10 +28,10 @@ export default function Ranking() {
       }
       const list = data as RankingRow[];
       setRows(list);
+      // Solo mantenemos selección si el usuario ya eligió uno (no auto-abrir panel)
       setSelected((prev) => {
-        if (!prev) return list[0] ?? null;
-        // Mantenemos seleccionado el mismo creador, con los datos frescos
-        return list.find((r) => r.id === prev.id) ?? list[0] ?? null;
+        if (!prev) return null;
+        return list.find((r) => r.id === prev.id) ?? null;
       });
     }
 
@@ -62,12 +62,6 @@ export default function Ranking() {
 
   return (
     <div id="ranking" className="mx-auto max-w-3xl px-4 pb-20">
-      {selected && (
-        <div className="mb-8">
-          <BidPanel creator={selected} />
-        </div>
-      )}
-
       <h2 className="mb-4 font-display text-xl font-bold">Ranking completo</h2>
       <div className="overflow-hidden rounded-2xl border border-base-line">
         <table className="w-full text-left text-sm">
@@ -105,7 +99,13 @@ export default function Ranking() {
                   <button
                     onClick={() => {
                       setSelected(row);
-                      document.getElementById("ranking")?.scrollIntoView({ behavior: "smooth" });
+                      // Scroll al panel de puja tras el siguiente render
+                      setTimeout(() => {
+                        document.getElementById("bid-panel")?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
+                      }, 50);
                     }}
                     className="focus-ring rounded-full border border-neon-pink/40 px-3 py-1 text-xs font-bold uppercase text-neon-pink hover:bg-neon-pink/10"
                   >
@@ -117,6 +117,13 @@ export default function Ranking() {
           </tbody>
         </table>
       </div>
+
+      {/* Panel de puja: solo cuando el usuario pulsa Superar */}
+      {selected && (
+        <div id="bid-panel" className="mt-8">
+          <BidPanel creator={selected} />
+        </div>
+      )}
     </div>
   );
 }
