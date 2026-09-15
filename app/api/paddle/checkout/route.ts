@@ -4,6 +4,13 @@ import { createPaddleTransaction } from "@/lib/paddle";
 
 const PRODUCT_ID = process.env.PADDLE_PRODUCT_ID!;
 
+/**
+ * Lógica de puja — paso 1: crear cobro
+ *
+ * El usuario elige un total nuevo (ej. $5).
+ * Se cobra SOLO la diferencia respecto a la puja actual (ej. actual $3 → cobra $2).
+ * Tras el pago, el webhook aplicará place_bid_paid_v2.
+ */
 export async function POST(request: Request) {
   try {
     const { creatorId, amount, bidderName, message } = await request.json();
@@ -21,9 +28,16 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!process.env.PADDLE_API_KEY) {
+      return NextResponse.json(
+        { error: "Falta PADDLE_API_KEY en el servidor" },
+        { status: 500 }
+      );
+    }
+
     if (!PRODUCT_ID) {
       return NextResponse.json(
-        { error: "Paddle no configurado (falta PADDLE_PRODUCT_ID)" },
+        { error: "Falta PADDLE_PRODUCT_ID" },
         { status: 500 }
       );
     }
@@ -41,14 +55,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Creador no encontrado" }, { status: 404 });
     }
 
-    if (amount <= creator.current_bid) {
+    // Regla: la nueva puja debe superar la actual
+    if (amount <= Number(creator.current_bid)) {
       return NextResponse.json(
         { error: `Debes pujar más de ${creator.current_bid}` },
         { status: 400 }
       );
     }
 
-    const amountToCharge = amount - creator.current_bid;
+    // Se cobra solo la diferencia
+    const amountToCharge =
+      Math.round((amount - Number(creator.current_bid)) * 100) / 100;
+
     if (amountToCharge < 0.5) {
       return NextResponse.json(
         { error: "El importe mínimo a cobrar es $0.50" },
@@ -56,7 +74,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // TokBid se queda con el 100% de la puja
+    // TokBid 100%
     const creatorShare = 0;
     const platformShare = amountToCharge;
 
@@ -66,9 +84,9 @@ export async function POST(request: Request) {
     const txn = await createPaddleTransaction({
       productId: PRODUCT_ID,
       amountUsd: amountToCharge,
-      description: `Superar @${creator.tiktok_username} en TokBid`,
+      description: `Superar @${creator.tiktok_username} en TokBid (total $${amount})`,
       customData: {
-        creator_id: creator.id,
+        creator_id: String(creator.id),
         bidder_name: cleanName,
         new_total_bid: String(amount),
         amount_charged: String(amountToCharge),
@@ -78,7 +96,11 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ transactionId: txn.id });
+    return NextResponse.json({
+      transactionId: txn.id,
+      amountToCharge,
+      newTotalBid: amount,
+    });
   } catch (err) {
     console.error("Paddle checkout error:", err);
     const text = err instanceof Error ? err.message : "Error al iniciar el pago";
