@@ -20,14 +20,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             TokBid no está afiliado, asociado ni respaldado por TikTok. No aumenta seguidores, vistas
             ni alcance en ninguna red social. Solo afecta al ranking de este sitio.
           </p>
-          <div className="mt-3 flex justify-center gap-4 text-xs">
+          <nav
+            aria-label="Información legal"
+            className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs"
+          >
+            <a href="/pricing" className="hover:text-white/70">
+              Precios
+            </a>
+            <a href="/refunds" className="hover:text-white/70">
+              Reembolsos
+            </a>
             <a href="/terms" className="hover:text-white/70">
               Términos y Condiciones
             </a>
             <a href="/privacy" className="hover:text-white/70">
               Privacidad
             </a>
-          </div>
+          </nav>
         </footer>
       </body>
     </html>
