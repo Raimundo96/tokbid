@@ -28,10 +28,10 @@ export default function Ranking() {
       }
       const list = data as RankingRow[];
       setRows(list);
+      // Solo mantenemos selección si el usuario ya eligió uno (no auto-abrir panel)
       setSelected((prev) => {
-        if (!prev) return list[0] ?? null;
-        // Mantenemos seleccionado el mismo creador, con los datos frescos
-        return list.find((r) => r.id === prev.id) ?? list[0] ?? null;
+        if (!prev) return null;
+        return list.find((r) => r.id === prev.id) ?? null;
       });
     }
 
@@ -62,22 +62,16 @@ export default function Ranking() {
 
   return (
     <div id="ranking" className="mx-auto max-w-3xl px-4 pb-20">
-      {selected && (
-        <div className="mb-8">
-          <BidPanel creator={selected} />
-        </div>
-      )}
-
-      <h2 className="mb-4 font-display text-xl font-bold">Ranking completo</h2>
+      <h2 className="mb-4 font-display text-xl font-bold">Ranking del juego</h2>
       <div className="overflow-hidden rounded-2xl border border-base-line">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-base-line bg-white/[0.02] text-white/50">
               <th className="px-4 py-3 font-medium">#</th>
-              <th className="px-4 py-3 font-medium">Creador</th>
-              <th className="hidden px-4 py-3 font-medium sm:table-cell">Seguidores</th>
-              <th className="px-4 py-3 font-medium">Puja</th>
-              <th className="hidden px-4 py-3 font-medium sm:table-cell">Puja de</th>
+              <th className="px-4 py-3 font-medium">Perfil</th>
+              <th className="hidden px-4 py-3 font-medium sm:table-cell">Ref.</th>
+              <th className="px-4 py-3 font-medium">Puntos</th>
+              <th className="hidden px-4 py-3 font-medium sm:table-cell">Último jugador</th>
               <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
@@ -105,11 +99,17 @@ export default function Ranking() {
                   <button
                     onClick={() => {
                       setSelected(row);
-                      document.getElementById("ranking")?.scrollIntoView({ behavior: "smooth" });
+                      // Scroll al panel de puja tras el siguiente render
+                      setTimeout(() => {
+                        document.getElementById("bid-panel")?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "center",
+                        });
+                      }, 50);
                     }}
                     className="focus-ring rounded-full border border-neon-pink/40 px-3 py-1 text-xs font-bold uppercase text-neon-pink hover:bg-neon-pink/10"
                   >
-                    Superar
+                    Jugar
                   </button>
                 </td>
               </tr>
@@ -117,6 +117,13 @@ export default function Ranking() {
           </tbody>
         </table>
       </div>
+
+      {/* Panel de apoyo: solo cuando el usuario pulsa Apoyar */}
+      {selected && (
+        <div id="bid-panel" className="mt-8">
+          <BidPanel creator={selected} />
+        </div>
+      )}
     </div>
   );
 }

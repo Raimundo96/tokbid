@@ -3,8 +3,9 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "TokBid — ¿Quién merece ser el #1?",
-  description: "Puja para subir. Supera a los mejores. ¿Quién merece ser el #1?",
+  title: "TokBid — Ranking social de entretenimiento",
+  description:
+    "Juego de ranking independiente. Compite en una tabla por diversión. No afiliado a TikTok. No aumenta seguidores ni vistas en redes sociales.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -13,13 +14,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-body antialiased min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-base-line py-8 text-center text-sm text-white/40">
-          TokBid — pagos reales procesados de forma segura con Stripe.
-          <div className="mt-2 flex justify-center gap-4 text-xs">
-            <a href="/terms" className="hover:text-white/70">Términos y Condiciones</a>
-            <a href="/privacy" className="hover:text-white/70">Privacidad</a>
-            <a href="/pricing" className="hover:text-white/70">Precios</a>
-            <a href="/refunds" className="hover:text-white/70">Reembolsos</a>
+        <footer className="border-t border-base-line px-4 py-8 text-center text-sm text-white/40">
+          <p>TokBid — juego de ranking de entretenimiento. Pagos procesados de forma segura.</p>
+          <p className="mx-auto mt-2 max-w-xl text-[11px] leading-relaxed text-white/30">
+            TokBid no está afiliado, asociado ni respaldado por TikTok. No aumenta seguidores, vistas
+            ni alcance en ninguna red social. Solo afecta al ranking de este sitio.
+          </p>
+          <div className="mt-3 flex justify-center gap-4 text-xs">
+            <a href="/terms" className="hover:text-white/70">
+              Términos y Condiciones
+            </a>
+            <a href="/privacy" className="hover:text-white/70">
+              Privacidad
+            </a>
           </div>
         </footer>
       </body>
