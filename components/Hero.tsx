@@ -24,7 +24,7 @@ export default function Hero() {
           >
             ⚔️ Superar al #1
           </a>
-          <span className="text-xs text-white/40">Desde $1 · pago seguro con Paddle</span>
+          <span className="text-xs text-white/40">Desde $1 · pago con Stripe</span>
         </div>
       </div>
     </section>

@@ -14,10 +14,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navbar />
         <main className="flex-1">{children}</main>
         <footer className="border-t border-base-line py-8 text-center text-sm text-white/40">
-          TokBid — pagos reales procesados de forma segura con Paddle.
+          TokBid — pagos reales procesados de forma segura con Stripe.
           <div className="mt-2 flex justify-center gap-4 text-xs">
             <a href="/terms" className="hover:text-white/70">Términos y Condiciones</a>
             <a href="/privacy" className="hover:text-white/70">Privacidad</a>
+            <a href="/pricing" className="hover:text-white/70">Precios</a>
+            <a href="/refunds" className="hover:text-white/70">Reembolsos</a>
           </div>
         </footer>
       </body>

@@ -1,61 +1,87 @@
-export const metadata = { title: "Términos y Condiciones — TokBid" };
+import type { Metadata } from "next";
+import LegalPage, { List, Paragraph, Section } from "@/components/LegalPage";
+
+export const metadata: Metadata = {
+  title: "Condiciones de servicio | Tokbid",
+  description: "Condiciones de servicio de la plataforma Tokbid.",
+};
 
 export default function TermsPage() {
   return (
-    <section className="mx-auto max-w-2xl px-4 py-16 text-sm leading-relaxed text-white/70">
-      <h1 className="mb-2 font-display text-2xl font-bold text-white">Términos y Condiciones</h1>
-      <p className="mb-8 text-xs text-white/40">Última actualización: [completa la fecha]</p>
+    <LegalPage title="Condiciones de servicio" updated="15 de septiembre de 2026">
+      <Section title="1. Información general">
+        <Paragraph>
+          Estas Condiciones de Servicio regulan el acceso y uso de Tokbid, una plataforma web que permite a los usuarios apoyar económicamente a creadores mediante un sistema de pujas.
+        </Paragraph>
+        <Paragraph>
+          El operador del servicio es <strong className="text-white">tokbid</strong>, con domicilio en <strong className="text-white">Guinea Ecuatorial</strong>. Si la información legal del operador cambia, esta sección se actualizará.
+        </Paragraph>
+      </Section>
 
-      <p className="mb-6">
-        Estos Términos regulan el uso de TokBid (la "Plataforma"), operada por [tu nombre o
-        razón social] ("nosotros"). Al usar la Plataforma, aceptas estos Términos.
-      </p>
+      <Section title="2. Aceptación">
+        <Paragraph>Al utilizar Tokbid aceptas estas condiciones y las políticas publicadas en el sitio. Si no estás de acuerdo, no debes utilizar el servicio.</Paragraph>
+      </Section>
 
-      <h2 className="mt-8 mb-2 font-display text-lg font-bold text-white">1. Qué es TokBid</h2>
-      <p className="mb-6">
-        TokBid es un ranking público en el que cualquiera puede pujar dinero real, con solo un
-        nombre (sin necesidad de crear una cuenta), para colocar un perfil de TikTok en una
-        posición más alta. La posición se pierde en cuanto otro usuario puja más alto: no es una
-        compra de un bien ni un servicio garantizado a largo plazo.
-      </p>
+      <Section title="3. Uso del servicio">
+        <Paragraph>Tokbid no requiere crear una cuenta. Para pujar, el usuario proporciona un nombre que se mostrará públicamente junto a su puja en el ranking. El usuario es responsable de la veracidad de ese nombre y de la actividad que realice al pujar.</Paragraph>
+        <Paragraph>Tokbid podrá establecer requisitos de edad o de uso cuando sean necesarios para cumplir la legislación aplicable o las reglas de los proveedores de pago.</Paragraph>
+      </Section>
 
-      <h2 className="mt-8 mb-2 font-display text-lg font-bold text-white">2. Edad mínima</h2>
-      <p className="mb-6">Debes tener al menos 18 años para pujar, ya que la Plataforma procesa pagos reales.</p>
+      <Section title="4. Sistema de pujas">
+        <Paragraph>Tokbid permite realizar pujas asociadas a creadores. Una puja puede afectar a la posición o importe mostrado en la plataforma según la lógica vigente del servicio.</Paragraph>
+        <Paragraph>El sistema debe utilizarse de buena fe. Una puja no debe realizarse mediante información falsa, manipulación técnica, automatización abusiva o métodos destinados a perjudicar a otros usuarios.</Paragraph>
+      </Section>
 
-      <h2 className="mt-8 mb-2 font-display text-lg font-bold text-white">3. Pagos</h2>
-      <p className="mb-6">
-        Los pagos se procesan a través de Stripe. Al pujar, se te cobra únicamente la diferencia
-        necesaria para superar la puja actual del creador (no el importe total mostrado en el
-        ranking).
-      </p>
+      <Section title="5. Pagos y transacciones">
+        <Paragraph>Cuando una acción requiera pago, el usuario podrá revisar el importe aplicable antes de confirmarlo. Las transacciones pueden ser procesadas mediante proveedores externos de pago.</Paragraph>
+        <Paragraph>Tokbid puede obtener una comisión sobre las transacciones realizadas a través de la plataforma. Las tarifas aplicables se comunicarán antes de la confirmación del pago.</Paragraph>
+      </Section>
 
-      <h2 className="mt-8 mb-2 font-display text-lg font-bold text-white">4. Reembolsos</h2>
-      <p className="mb-6">
-        No se ofrecen reembolsos por el simple hecho de que otro usuario supere tu puja después.
-        Sí se investigará cualquier cobro duplicado, no autorizado, o fallo técnico demostrable.
-        Para reclamar, contacta con [tu email de soporte].
-      </p>
+      <Section title="6. Responsabilidades del usuario">
+        <List>
+          <li>Utilizar Tokbid de acuerdo con estas condiciones y la legislación aplicable.</li>
+          <li>No intentar acceder a cuentas, datos o sistemas sin autorización.</li>
+          <li>No interferir con el funcionamiento, seguridad o disponibilidad de la plataforma.</li>
+          <li>No utilizar la plataforma para actividades ilícitas, fraudulentas o engañosas.</li>
+          <li>Mantener actualizada y veraz la información que proporciones al pujar.</li>
+        </List>
+      </Section>
 
-      <h2 className="mt-8 mb-2 font-display text-lg font-bold text-white">5. Perfiles en el ranking</h2>
-      <p className="mb-6">
-        Nos reservamos el derecho de eliminar o suspender cualquier perfil del ranking, incluso a
-        petición de la persona representada en él, sin necesidad de justificación previa.
-      </p>
+      <Section title="7. Conductas prohibidas">
+        <Paragraph>Está prohibido utilizar Tokbid para fraude, suplantación de identidad, manipulación deliberada del sistema, abuso de promociones o pagos, distribución de contenido ilegal, infracción de derechos de terceros o cualquier actividad que pueda causar daños a la plataforma o a otros usuarios.</Paragraph>
+      </Section>
 
-      <h2 className="mt-8 mb-2 font-display text-lg font-bold text-white">6. Usos prohibidos</h2>
-      <p className="mb-6">
-        No está permitido usar nombres ofensivos, suplantar a otra persona, publicar contenido
-        ilegal o difamatorio, ni intentar vulnerar la seguridad de la Plataforma.
-      </p>
+      <Section title="8. Contenido de los usuarios">
+        <Paragraph>Los usuarios pueden publicar información o contenido cuando las funciones de Tokbid lo permitan. El usuario conserva los derechos que le correspondan sobre su contenido, pero declara que tiene derecho a publicarlo y que no infringe la ley ni derechos de terceros.</Paragraph>
+      </Section>
 
-      <h2 className="mt-8 mb-2 font-display text-lg font-bold text-white">7. Limitación de responsabilidad</h2>
-      <p className="mb-6">
-        TokBid se ofrece "tal cual". No garantizamos que el servicio esté libre de
-        interrupciones o errores.
-      </p>
+      <Section title="9. Propiedad intelectual">
+        <Paragraph>Tokbid, su software, marca, diseño y contenido propio están protegidos por las leyes aplicables. Salvo autorización expresa, no se permite copiar, modificar, distribuir o explotar comercialmente estos elementos fuera de los usos permitidos por la plataforma.</Paragraph>
+      </Section>
 
-      <h2 className="mt-8 mb-2 font-display text-lg font-bold text-white">8. Contacto</h2>
-      <p className="mb-6">Para cualquier duda, escribe a [tu email de contacto].</p>
-    </section>
+      <Section title="10. Suspensión o cancelación">
+        <Paragraph>Tokbid podrá limitar, suspender o bloquear la participación de un usuario en la plataforma cuando existan motivos razonables relacionados con incumplimientos de estas condiciones, fraude, seguridad, obligaciones legales o abuso del servicio.</Paragraph>
+      </Section>
+
+      <Section title="11. Disponibilidad y cambios">
+        <Paragraph>Tokbid puede actualizar, modificar, suspender o retirar determinadas funciones del servicio. Procuraremos mantener la plataforma disponible, pero no garantizamos disponibilidad ininterrumpida.</Paragraph>
+      </Section>
+
+      <Section title="12. Limitación de responsabilidad">
+        <Paragraph>En la medida permitida por la legislación aplicable, Tokbid no será responsable de pérdidas indirectas, interrupciones causadas por terceros, fallos de redes externas o circunstancias fuera de su control. Nada de esta sección limita derechos que legalmente no puedan excluirse.</Paragraph>
+      </Section>
+
+      <Section title="13. Modificaciones de estas condiciones">
+        <Paragraph>Podemos actualizar estas condiciones para reflejar cambios en el servicio, requisitos legales o necesidades operativas. La versión publicada en esta página será la versión vigente.</Paragraph>
+      </Section>
+
+      <Section title="14. Ley aplicable y jurisdicción">
+        <Paragraph>Estas condiciones se regirán por <strong className="text-white">Las leyes de Guinea Ecuatorial</strong> y cualquier controversia estará sujeta a <strong className="text-white">los tribunales de Guinea Ecuatorial</strong>, salvo que la legislación aplicable disponga otra cosa.</Paragraph>
+      </Section>
+
+      <Section title="15. Contacto">
+        <Paragraph>Para cuestiones relacionadas con estas condiciones: <strong className="text-white">Raimundoevita96@gmail.com</strong>.</Paragraph>
+      </Section>
+    </LegalPage>
   );
 }
