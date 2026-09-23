@@ -18,7 +18,7 @@ function verifyPaddleSignature(
   const h1 = parts["h1"];
   if (!ts || !h1) return false;
   const expected = crypto
-    .createHmac("sha256", secret)
+    .createHmac("sha256", secret.trim())
     .update(`${ts}:${rawBody}`)
     .digest("hex");
   try {
@@ -28,7 +28,6 @@ function verifyPaddleSignature(
   }
 }
 
-/** Respaldo: si el webhook llega, también aplica la puja. */
 export async function POST(request: Request) {
   const rawBody = await request.text();
   const signature = request.headers.get("paddle-signature");

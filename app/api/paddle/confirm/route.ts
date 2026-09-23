@@ -2,16 +2,7 @@ import { NextResponse } from "next/server";
 import { getPaddleTransaction } from "@/lib/paddle";
 import { applyPaidBid } from "@/lib/applyBid";
 
-/**
- * Ruta PRINCIPAL para subir el ranking tras pagar.
- * No depende del webhook de Paddle.
- *
- * Flujo:
- * 1. El cliente termina el checkout
- * 2. Llama aquí con transactionId
- * 3. Verificamos en Paddle que status = completed
- * 4. Aplicamos place_bid_paid (la misma lógica que Stripe)
- */
+/** Confirma el pago con la API de Paddle y sube el ranking (no depende del webhook). */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -23,26 +14,17 @@ export async function POST(request: Request) {
 
     console.log("[paddle confirm] txn=", transactionId);
 
-    const txn = await getPaddleTransaction(transactionId);
-    console.log("[paddle confirm] status=", txn.status, "custom=", txn.custom_data);
+    let txn = await getPaddleTransaction(transactionId);
 
-    // En sandbox a veces el status tarda un instante
     if (txn.status !== "completed" && txn.status !== "billed" && txn.status !== "paid") {
-      // Reintento corto: a veces el status aún es "ready" o "drafted" al instante
       await new Promise((r) => setTimeout(r, 1500));
-      const again = await getPaddleTransaction(transactionId);
-      console.log("[paddle confirm] retry status=", again.status);
-      if (
-        again.status !== "completed" &&
-        again.status !== "billed" &&
-        again.status !== "paid"
-      ) {
+      txn = await getPaddleTransaction(transactionId);
+      if (txn.status !== "completed" && txn.status !== "billed" && txn.status !== "paid") {
         return NextResponse.json(
-          { error: `Pago no completado aún (status: ${again.status})` },
+          { error: `Pago no completado aún (status: ${txn.status})` },
           { status: 400 }
         );
       }
-      Object.assign(txn, again);
     }
 
     const custom = txn.custom_data || {};
@@ -53,7 +35,7 @@ export async function POST(request: Request) {
 
     if (!creatorId || !bidderName || !newTotalBid || !amountCharged) {
       return NextResponse.json(
-        { error: "custom_data incompleta en la transacción", custom },
+        { error: "custom_data incompleta", custom },
         { status: 400 }
       );
     }
@@ -71,7 +53,7 @@ export async function POST(request: Request) {
 
     if (!result.success) {
       return NextResponse.json(
-        { error: result.error || "Error aplicando puja" },
+        { error: result.error || "Error aplicando puntuación" },
         { status: 500 }
       );
     }
@@ -79,7 +61,7 @@ export async function POST(request: Request) {
     console.log("[paddle confirm] OK", result);
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
-    console.error("[paddle confirm] exception", err);
+    console.error("[paddle confirm]", err);
     const text = err instanceof Error ? err.message : "Error confirmando";
     return NextResponse.json({ error: text }, { status: 500 });
   }

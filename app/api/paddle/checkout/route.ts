@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       typeof bidderName === "string" ? bidderName.trim().slice(0, 40) : "";
     if (!cleanName) {
       return NextResponse.json(
-        { error: "Escribe tu nombre para poder pujar" },
+        { error: "Escribe tu nombre para poder participar" },
         { status: 400 }
       );
     }
@@ -37,12 +37,12 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (creatorError || !creator) {
-      return NextResponse.json({ error: "Creador no encontrado" }, { status: 404 });
+      return NextResponse.json({ error: "Perfil no encontrado" }, { status: 404 });
     }
 
     if (amount <= Number(creator.current_bid)) {
       return NextResponse.json(
-        { error: `Debes pujar más de ${creator.current_bid}` },
+        { error: `Debes superar ${creator.current_bid}` },
         { status: 400 }
       );
     }
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     const txn = await createPaddleTransaction({
       productId: PRODUCT_ID,
       amountUsd: amountToCharge,
-      description: `Superar @${creator.tiktok_username} en TokBid`,
+      description: `TokBid ranking — @${creator.tiktok_username}`,
       customData: {
         creator_id: String(creator.id),
         bidder_name: cleanName,

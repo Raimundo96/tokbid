@@ -6,7 +6,7 @@ const PADDLE_API_BASE =
 function getApiKey() {
   const key = process.env.PADDLE_API_KEY;
   if (!key) throw new Error("Falta PADDLE_API_KEY en las variables de entorno");
-  return key;
+  return key.trim();
 }
 
 export async function paddleFetch<T = unknown>(
