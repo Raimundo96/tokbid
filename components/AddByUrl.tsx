@@ -42,7 +42,7 @@ export default function AddByUrl() {
       });
 
       if (rpcError || !data?.success) {
-        setError("No se pudo añadir ese perfil al ranking.");
+        setError("No se pudo añadir ese perfil al ranking del juego.");
         setLoading(false);
         return;
       }
@@ -69,15 +69,17 @@ export default function AddByUrl() {
     <section className="mx-auto max-w-md px-4 pb-10">
       <div className="card-panel rounded-2xl border border-base-line p-6">
         <p className="font-display text-sm font-extrabold uppercase tracking-wide text-white/80">
-          ¿No está en el ranking?
+          ¿No está en el ranking del juego?
         </p>
         <p className="mt-1 text-xs text-white/40">
-          Pega el enlace de un perfil de TikTok y puja directamente por él.
+          Añade un @usuario y su foto a la tabla de TokBid. Es solo para este ranking de
+          entretenimiento: <strong className="text-white/50">no modifica su cuenta real</strong> ni
+          en TikTok ni en ninguna otra plataforma.
         </p>
         <div className="mt-4 flex gap-2">
           <input
-            type="url"
-            placeholder="https://www.tiktok.com/@usuario"
+            type="text"
+            placeholder="@usuario o enlace del perfil"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             className="focus-ring flex-1 rounded-lg border border-base-line bg-base-panel px-3 py-2 text-sm"
@@ -87,10 +89,14 @@ export default function AddByUrl() {
             disabled={loading}
             className="focus-ring rounded-full bg-neon-cyan px-4 py-2 text-xs font-extrabold uppercase text-black disabled:opacity-50"
           >
-            {loading ? "Buscando..." : "Buscar"}
+            {loading ? "Buscando..." : "Añadir"}
           </button>
         </div>
         {error && <p className="mt-3 text-center text-sm text-neon-pink">{error}</p>}
+        <p className="mt-3 text-center text-[10px] leading-relaxed text-white/30">
+          TokBid no está afiliado a TikTok. Los datos del perfil solo se usan como identidad
+          visual dentro de este juego.
+        </p>
       </div>
 
       {creator && (
@@ -98,14 +104,23 @@ export default function AddByUrl() {
           <div className="mb-3 flex items-center gap-3">
             <div className="relative h-12 w-12 overflow-hidden rounded-full border border-neon-cyan/50">
               {creator.avatar_url ? (
-                <Image src={creator.avatar_url} alt={creator.display_name} fill sizes="48px" className="object-cover" />
+                <Image
+                  src={creator.avatar_url}
+                  alt={creator.display_name}
+                  fill
+                  sizes="48px"
+                  className="object-cover"
+                />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-base-panel">🎤</div>
               )}
             </div>
             <div>
               <p className="text-sm font-semibold">@{creator.tiktok_username}</p>
-              <p className="text-xs text-white/40">{formatFollowers(creator.followers)} seguidores</p>
+              <p className="text-xs text-white/40">
+                Perfil en el juego
+                {creator.followers ? ` · ref. ${formatFollowers(creator.followers)}` : ""}
+              </p>
             </div>
           </div>
           <BidPanel creator={creator} />
